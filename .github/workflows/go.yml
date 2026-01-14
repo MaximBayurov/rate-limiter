@@ -16,13 +16,13 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GOLANG_VERSION }}
-
-      - name: Check out code
-        uses: actions/checkout@v4
 
       - name: Linters
         run: make lint
@@ -30,13 +30,13 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GOLANG_VERSION }}
-
-      - name: Check out code
-        uses: actions/checkout@v4
 
       - name: Unit tests
         run: make test
@@ -44,12 +44,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ env.GOLANG_VERSION }}
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GOLANG_VERSION }}
 
-    - name: Build
-      run: make build
+      - name: Build
+        run: make build
