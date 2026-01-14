@@ -15,8 +15,8 @@ build:
 	go build -v -o $(APP_BIN) -ldflags "$(LDFLAGS)" ./cmd/app
 .PHONY: build
 
-run: build
-	$(APP_BIN)
+run:
+	docker-compose -f ./compose.yaml up -d
 .PHONY: run
 
 test:
