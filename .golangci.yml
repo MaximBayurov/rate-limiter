@@ -54,8 +54,10 @@ linters:
             - '!$test'
           allow:
             - $gostd
-            - golang.org/x/example/hello/reverse
-            - github.com/cheggaaa/pb/v3
+            - github.com/jmoiron/sqlx
+            - github.com/MaximBayurov/rate-limiter
+            - github.com/jackc/pgx/stdlib
+            - github.com/spf13/viper
         Test:
           files:
             - $test

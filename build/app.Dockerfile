@@ -70,8 +70,11 @@ USER appuser
 # Copy the executable from the "build" stage.
 COPY --from=build /bin/server /bin/
 
+ENV CONFIG_FILE /etc/app/config.yaml
+COPY ./config/app/config.yaml ${CONFIG_FILE}
+
 # Expose the port that the application listens on.
 EXPOSE 80
 
 # What the container should run when it is started.
-ENTRYPOINT [ "/bin/server" ]
+CMD /bin/server -config ${CONFIG_FILE}
