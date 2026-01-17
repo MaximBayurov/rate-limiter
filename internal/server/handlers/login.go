@@ -6,17 +6,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/MaximBayurov/rate-limiter/internal/app"
-	"github.com/MaximBayurov/rate-limiter/internal/iplists"
+	application "github.com/MaximBayurov/rate-limiter/internal/app"
 	"github.com/MaximBayurov/rate-limiter/internal/logger"
 )
 
-const contentType = "application/json"
-
-type Handler func(http.ResponseWriter, *http.Request)
-
-func AddIPHandler( //nolint:dupl
-	app app.App,
+func TryLoginHandler( //nolint:dupl
+	app application.App,
 	logger logger.Logger,
 ) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -33,9 +28,9 @@ func AddIPHandler( //nolint:dupl
 		}
 
 		var request struct {
-			IP        string `json:"ip"`
-			Type      string `json:"type"`
-			Overwrite bool   `json:"overwrite,omitempty"`
+			Login    string `json:"login"`
+			Password string `json:"password"`
+			IP       string `json:"ip"`
 		}
 
 		// Декодируем JSON тело запроса в структуру
@@ -55,12 +50,12 @@ func AddIPHandler( //nolint:dupl
 			}
 		}()
 
-		err = app.AddIP(
+		err = app.TryLogin(
+			request.Login,
+			request.Password,
 			request.IP,
-			request.Type,
-			request.Overwrite,
 		)
-		if err != nil && !errors.Is(err, iplists.ErrBase) {
+		if err != nil && !errors.Is(err, application.ErrBase) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -69,7 +64,7 @@ func AddIPHandler( //nolint:dupl
 		if err != nil {
 			message = err.Error()
 		} else {
-			message = "IP успешно добавлен в список"
+			message = "авторизация разрешена"
 		}
 		// Отправляем ответ
 		w.Header().Set("Content-Type", "application/json")
@@ -83,8 +78,8 @@ func AddIPHandler( //nolint:dupl
 	}
 }
 
-func DeleteIPHandler(
-	app app.App,
+func ClearBucketHandler(
+	app application.App,
 	logger logger.Logger,
 ) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -101,8 +96,8 @@ func DeleteIPHandler(
 		}
 
 		var request struct {
-			IP   string `json:"ip"`
-			Type string `json:"type"`
+			Login string `json:"login"`
+			IP    string `json:"ip"`
 		}
 
 		// Декодируем JSON тело запроса в структуру
@@ -122,11 +117,11 @@ func DeleteIPHandler(
 			}
 		}()
 
-		err = app.DeleteIP(
+		err = app.ClearLoginAttempts(
+			request.Login,
 			request.IP,
-			request.Type,
 		)
-		if err != nil && !errors.Is(err, iplists.ErrBase) {
+		if err != nil && !errors.Is(err, application.ErrBase) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -135,7 +130,7 @@ func DeleteIPHandler(
 		if err != nil {
 			message = err.Error()
 		} else {
-			message = "IP успешно удален из списка"
+			message = "количество попыток успешно сброшено"
 		}
 		// Отправляем ответ
 		w.Header().Set("Content-Type", "application/json")

@@ -44,7 +44,7 @@ func main() {
 	}
 
 	application := app.New(logg, db, config.App)
-	serv := server.New(logg, application, config.Server)
+	serv := server.New(logg, &application, config.Server)
 	go func() {
 		<-ctx.Done()
 

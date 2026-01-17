@@ -15,4 +15,6 @@ logger:
   level: "INFO"
   file: ""
 app:
-
+  login_attempts: 10
+  password_attempts: 100
+  ip_attempts: 1000

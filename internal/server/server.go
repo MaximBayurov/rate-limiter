@@ -20,11 +20,11 @@ type Server interface {
 type HTTPServer struct {
 	srv     *http.Server
 	logger  logger.Logger
-	app     app.App
+	app     *app.App
 	configs configuration.ServerConf
 }
 
-func New(logger logger.Logger, app app.App, configs configuration.ServerConf) Server {
+func New(logger logger.Logger, app *app.App, configs configuration.ServerConf) Server {
 	return HTTPServer{
 		srv: &http.Server{
 			ReadHeaderTimeout: 10 * time.Second,
@@ -38,8 +38,10 @@ func New(logger logger.Logger, app app.App, configs configuration.ServerConf) Se
 func (s HTTPServer) Start(_ context.Context) error {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("PUT /ip/list", handlers.AddIPHandler(s.app, s.logger))
-	mux.HandleFunc("DELETE /ip/list", handlers.DeleteIPHandler(s.app, s.logger))
+	mux.HandleFunc("PUT /ip/list", handlers.AddIPHandler(*s.app, s.logger))
+	mux.HandleFunc("DELETE /ip/list", handlers.DeleteIPHandler(*s.app, s.logger))
+	mux.HandleFunc("PUT /auth", handlers.TryLoginHandler(*s.app, s.logger))
+	mux.HandleFunc("DELETE /auth", handlers.ClearBucketHandler(*s.app, s.logger))
 
 	handler := loggingMiddleware(&s.logger)(mux)
 
