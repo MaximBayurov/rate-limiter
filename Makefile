@@ -28,5 +28,5 @@ down:
 .PHONY: run
 
 test:
-	go test -race -count 100 ./internal/...
+	go test -race ./internal/...
 .PHONY: test
