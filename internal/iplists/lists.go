@@ -36,8 +36,7 @@ type SQLIPList struct {
 }
 
 // Add добавляет IP в список.
-// nolint: dupl
-func (l *SQLIPList) Add(ip string, listType ListType) error {
+func (l *SQLIPList) Add(ip string, listType ListType) error { //nolint: dupl
 	// Начинаем транзакцию
 	tx, err := l.db.Beginx()
 	if err != nil {
@@ -92,8 +91,7 @@ func (l *SQLIPList) Add(ip string, listType ListType) error {
 }
 
 // Update обновляет IP в списке.
-// nolint: dupl
-func (l *SQLIPList) Update(ip string, listType ListType) error {
+func (l *SQLIPList) Update(ip string, listType ListType) error { //nolint: dupl
 	// Начинаем транзакцию
 	tx, err := l.db.Beginx()
 	if err != nil {
@@ -149,8 +147,7 @@ func (l *SQLIPList) Update(ip string, listType ListType) error {
 }
 
 // Delete удаляет IP из списка.
-// nolint: dupl
-func (l *SQLIPList) Delete(ip string, listType ListType) error {
+func (l *SQLIPList) Delete(ip string, listType ListType) error { //nolint: dupl
 	// Начинаем транзакцию
 	tx, err := l.db.Beginx()
 	if err != nil {
