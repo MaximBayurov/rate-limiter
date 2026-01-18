@@ -83,6 +83,16 @@ func (a *BruteforceApp) TryLogin(login, password, ip string) error {
 		err = ErrIPDisallow
 	}
 
+	listType, iperr := a.ipList.In(ip)
+	if iperr == nil {
+		switch listType {
+		case iplists.Black:
+			err = ErrIPInBlackList
+		case iplists.White:
+			err = nil
+		}
+	}
+
 	return err
 }
 
