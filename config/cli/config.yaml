@@ -1,0 +1,4 @@
+client:
+  host: "http://localhost"
+  port: "80"
+  timeout: 10 #seconds

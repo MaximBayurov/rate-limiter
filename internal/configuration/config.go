@@ -13,6 +13,7 @@ type Config struct {
 	Database DbConf     `mapstructure:"database"`
 	App      AppConf    `mapstructure:"app"`
 	Server   ServerConf `mapstructure:"server"`
+	Client   ClientConf `mapstructure:"client"`
 }
 
 func New(filePath string) (Config, error) {
