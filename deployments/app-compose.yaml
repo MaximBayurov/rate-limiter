@@ -1,0 +1,73 @@
+name: rate-limiter
+services:
+  database:
+    image: postgres:17-alpine3.22
+    container_name: rate-limiter-database
+    restart: unless-stopped
+    volumes:
+      - rate-limiter-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DATABASE_DBNAME}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASS}
+    ports:
+      - ${DATABASE_PORT}:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_DBNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrations:
+    image: ghcr.io/kukymbr/goose-docker:3.26.0
+    container_name: rate-limiter-migrations
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=host=${DATABASE_HOST} port=${DATABASE_PORT} user=${DATABASE_USER} password=${DATABASE_PASS} dbname=${DATABASE_DBNAME}
+    networks:
+      - rate-limiter-network
+    volumes:
+      - ./../migrations:/migrations
+
+  server:
+    container_name: rate-limiter-server
+    build:
+      context: ./../
+      dockerfile: ./build/app.Dockerfile
+      target: final
+    ports:
+      - 80:80
+    depends_on:
+      database:
+        condition: service_healthy
+        required: true
+      migrations:
+        condition: service_completed_successfully
+        required: true
+    environment:
+      SERVER_HOST: "server"
+      SERVER_PORT: 80
+
+      LOGGER_FILE: "logs/app.log"
+
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_DBNAME: ${DATABASE_DBNAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+    volumes:
+      - type: bind
+        source: ./../logs/app
+        target: /logs
+    networks:
+      - rate-limiter-network
+
+volumes:
+  rate-limiter-db-data:
+    name: rate-limiter-db-data
+networks:
+  rate-limiter-network:
+    driver: bridge
