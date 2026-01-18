@@ -15,10 +15,18 @@ build:
 	go build -v -o $(APP_BIN) -ldflags "$(LDFLAGS)" ./cmd/app
 .PHONY: build
 
+rebuild-containers:
+	 docker-compose -f ./deployments/app-compose.yaml build --no-cache
+.PHONY: rebuild-containers
+
 run:
-	docker-compose -f ./compose.yaml up -d
+	docker-compose -f ./deployments/app-compose.yaml up -d
+.PHONY: run
+
+down:
+	docker-compose -f ./deployments/app-compose.yaml down
 .PHONY: run
 
 test:
-	go test -race -count 100 ./internal/...
+	go test -race ./internal/...
 .PHONY: test
