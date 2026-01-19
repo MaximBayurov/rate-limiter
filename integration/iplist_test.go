@@ -3,10 +3,11 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type TestIPListAPI struct {
@@ -69,7 +70,6 @@ func (s *TestIPListAPI) TestAdd() {
 
 		wg := sync.WaitGroup{}
 		for i := 0; i < 10; i++ {
-			i := i
 			wg.Add(1)
 			go func() {
 				defer wg.Done()

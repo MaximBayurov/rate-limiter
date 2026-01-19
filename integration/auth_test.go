@@ -3,12 +3,12 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/MaximBayurov/rate-limiter/internal/client"
-	"github.com/stretchr/testify/assert"
 	"sync"
 	"sync/atomic"
 	"testing"
 
+	"github.com/MaximBayurov/rate-limiter/internal/client"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -45,18 +45,18 @@ func (s *TestAuthAPI) TestTryAuth() {
 			login = fmt.Sprintf("pass-check-%d", i)
 			r, _ = s.apiClient.TryAuth(ctx, login, pass, ip)
 			if r.Success {
-				allowed += 1
+				allowed++
 			}
 		}
 		assert.Equal(t, 100, allowed)
 	})
 	s.T().Run("Превышение rate limit по IP", func(t *testing.T) {
 		ip := "120.0.0.3"
-		var allowed int32 = 0
+		var allowed int32
 		wg := sync.WaitGroup{}
 		for i := 0; i < 32; i++ {
 			wg.Add(1)
-			i := i
+
 			go func() {
 				defer wg.Done()
 				var r client.Response

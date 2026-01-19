@@ -42,7 +42,7 @@ type AppClient struct {
 	client  http.Client
 }
 
-func (c *AppClient) AddIP(ctx context.Context, ip, listType string, overwrite bool) (Response, error) {
+func (c *AppClient) AddIP(ctx context.Context, ip, listType string, overwrite bool) (Response, error) { //nolint:dupl
 	payload := struct {
 		IP        string `json:"ip"`
 		ListType  string `json:"type"`

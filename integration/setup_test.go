@@ -4,12 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/MaximBayurov/rate-limiter/internal/client"
-	"github.com/MaximBayurov/rate-limiter/internal/configuration"
 	"log"
 	"os"
 	"time"
 
+	"github.com/MaximBayurov/rate-limiter/internal/client"
+	"github.com/MaximBayurov/rate-limiter/internal/configuration"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -101,7 +101,7 @@ func (s *TestSuite) tryAuthN(
 	for i := 0; i < attempts; i++ {
 		resp, _ = s.apiClient.TryAuth(ctx, login, password, ip)
 		if resp.Success {
-			allowed += 1
+			allowed++
 		}
 	}
 	return allowed
