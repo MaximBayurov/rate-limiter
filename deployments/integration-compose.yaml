@@ -1,11 +1,11 @@
-name: rate-limiter
+name: test-rate-limiter
 services:
   database:
     image: postgres:17-alpine3.22
-    container_name: rate-limiter-database
+    container_name: test-rate-limiter-database
     restart: unless-stopped
     volumes:
-      - rate-limiter-db-data:/var/lib/postgresql/data
+      - test-rate-limiter-db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DATABASE_DBNAME}
       - POSTGRES_USER=${DATABASE_USER}
@@ -20,7 +20,7 @@ services:
 
   migrations:
     image: ghcr.io/kukymbr/goose-docker:3.26.0
-    container_name: rate-limiter-migrations
+    container_name: test-rate-limiter-migrations
     depends_on:
       database:
         condition: service_healthy
@@ -28,12 +28,12 @@ services:
       - GOOSE_DRIVER=postgres
       - GOOSE_DBSTRING=host=${DATABASE_HOST} port=${DATABASE_PORT} user=${DATABASE_USER} password=${DATABASE_PASS} dbname=${DATABASE_DBNAME}
     networks:
-      - rate-limiter-network
+      - test-rate-limiter-network
     volumes:
       - ./../migrations:/migrations
 
   server:
-    container_name: rate-limiter-server
+    container_name: test-rate-limiter-server
     build:
       context: ./../
       dockerfile: ./build/app.Dockerfile
@@ -51,8 +51,8 @@ services:
       SERVER_HOST: "server"
       SERVER_PORT: 80
 
-      LOGGER_FILE: "logs/app.log"
-      LOGGER_LEVEL: "INFO"
+      LOGGER_FILE: "" #set empty to improve performance
+      LOGGER_LEVEL: "ERROR"
 
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
@@ -61,14 +61,33 @@ services:
       DATABASE_PASS: ${DATABASE_PASS}
     volumes:
       - type: bind
-        source: ./../logs/app
+        source: ./../logs/test
         target: /logs
     networks:
-      - rate-limiter-network
+      - test-rate-limiter-network
+
+  # Контейнер с интеграционными тестами
+  integration-tests:
+    container_name: test-rate-limiter-integration
+    profiles:
+      - tests
+    build:
+      context: ./../
+      dockerfile: ./build/integration.Dockerfile
+    environment:
+      API_HOST: http://server
+      API_PORT: 80
+      DATABASE_DSN: postgres://${DATABASE_USER}:${DATABASE_PASS}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DBNAME}?sslmode=disable
+    depends_on:
+      server:
+        condition: service_started
+        required: true
+    networks:
+      - test-rate-limiter-network
 
 volumes:
-  rate-limiter-db-data:
-    name: rate-limiter-db-data
+  test-rate-limiter-db-data:
+    name: test-rate-limiter-db-data
 networks:
-  rate-limiter-network:
+  test-rate-limiter-network:
     driver: bridge

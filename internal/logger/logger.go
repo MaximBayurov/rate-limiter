@@ -23,12 +23,17 @@ func New(configs configuration.LoggerConf) (Logger, error) {
 		return nil, fmt.Errorf("failed to create log directory: %w", err)
 	}
 
-	var logFile *os.File
-	if logFile, err = os.OpenFile(configs.File, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644); err != nil {
-		return nil, fmt.Errorf("failed to open log file: %w", err)
-	}
+	var writer io.Writer
+	if configs.File != "" {
+		var logFile *os.File
+		if logFile, err = os.OpenFile(configs.File, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644); err != nil {
+			return nil, fmt.Errorf("failed to open log file: %w", err)
+		}
 
-	writer := io.MultiWriter(os.Stdout, logFile)
+		writer = io.MultiWriter(os.Stdout, logFile)
+	} else {
+		writer = io.MultiWriter(os.Stdout)
+	}
 
 	level := &slog.LevelVar{}
 	if err = level.UnmarshalText([]byte(configs.Level)); err != nil {

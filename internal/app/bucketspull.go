@@ -24,7 +24,9 @@ func (p *bucketsPull) ClearEmptyBuckets() {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
-	for key, b := range p.buckets {
+	var key string
+	var b bucket.Bucket
+	for key, b = range p.buckets {
 		if b.CurrentLoad() == 0 {
 			delete(p.buckets, key)
 		}

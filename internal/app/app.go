@@ -75,11 +75,11 @@ func (a *BruteforceApp) TryLogin(login, password, ip string) error {
 		err = ErrLoginDisallow
 	}
 	passwordOk := a.passwords.Allow(password)
-	if !passwordOk && err != nil {
+	if !passwordOk {
 		err = ErrPasswordDisallow
 	}
 	ipOk := a.ips.Allow(ip)
-	if !ipOk && err != nil {
+	if !ipOk {
 		err = ErrIPDisallow
 	}
 
