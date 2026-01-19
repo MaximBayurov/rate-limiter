@@ -1,0 +1,20 @@
+database:
+  host: ""
+  port: ""
+  dbname: ""
+  user: ""
+  pass: ""
+  conn:
+    lifetime: 5 #minutes
+    max_open: 25
+    max_idle: 25
+server:
+  host: ""
+  port: ""
+logger:
+  level: ""
+  file: ""
+app:
+  login_attempts: 10
+  password_attempts: 100
+  ip_attempts: 1000
